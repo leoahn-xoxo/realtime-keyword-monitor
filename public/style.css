@@ -166,7 +166,7 @@ main { padding: 18px 22px 60px; max-width: 1880px; margin: 0 auto; }
 }
 
 /* ── Tokenizer chips ───────────────────── */
-.tokenizer { display: flex; flex-wrap: wrap; gap: 8px; max-height: 168px; overflow-y: auto; }
+.tokenizer { display: flex; flex-wrap: wrap; gap: 8px; }
 .chip {
   border: none; border-radius: 8px; padding: 7px 12px;
   font-size: 12.5px; font-weight: 700; color: #fff; cursor: pointer;
