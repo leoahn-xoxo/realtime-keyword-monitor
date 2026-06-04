@@ -1,0 +1,20 @@
+name: keep-alive
+
+# 무료 Render 인스턴스가 15분 미사용 시 잠드는 것을 방지.
+# 정적 페이지가 아니라 /api/keywords 를 호출해 5분마다 실제 크롤링을 돌리므로
+# (1) 인스턴스가 깨어 있고 (2) 5분 단위 시계열이 방문자 없이도 누적됩니다.
+on:
+  schedule:
+    - cron: '*/5 * * * *'   # 5분마다 (GitHub 사정상 수 분 지연될 수 있음)
+  workflow_dispatch:        # 수동 실행 버튼
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping keyword API (keep awake + record time-series)
+        run: |
+          echo "ping $(date -u)"
+          # --max-time 90: 콜드스타트(~50초) 깨우기 여유. 실패해도 워크플로는 성공 처리(|| true)
+          curl -fsS --max-time 90 "https://realtime-keyword-monitor.onrender.com/api/keywords" -o /dev/null \
+            && echo "ok" || echo "ping failed (cold start or transient) — ignored"
