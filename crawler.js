@@ -93,22 +93,30 @@ async function crawlDaum() {
 
 // ─────────────────────────────────────────────────────────
 // 구글 — Google Trends 실시간 급상승 (공식 RSS, UTF-8)
+// approx_traffic(근사 검색량)까지 추출 → 검색량 내림차순 정렬
+// 반환: [{ keyword, raw }]  (raw = 근사 검색량 숫자)
 // ─────────────────────────────────────────────────────────
+function parseTraffic(s) {
+  if (!s) return 0;
+  const n = parseInt(s.replace(/[,+\s]/g, ''), 10);
+  return Number.isFinite(n) ? n : 0;
+}
 async function crawlGoogle() {
   const buf = await getBuffer('https://trends.google.com/trending/rss?geo=KR', 'https://trends.google.com/');
   const xml = decodeUTF8(buf);
-  const items = [];
+  const out = [];
   const seen = new Set();
   for (const block of xml.matchAll(/<item>([\s\S]*?)<\/item>/g)) {
-    const m = block[1].match(/<title>([\s\S]*?)<\/title>/);
-    if (!m) continue;
-    const kw = clean(m[1].replace(/<!\[CDATA\[|\]\]>/g, ''));
+    const tm = block[1].match(/<title>([\s\S]*?)<\/title>/);
+    if (!tm) continue;
+    const kw = clean(tm[1].replace(/<!\[CDATA\[|\]\]>/g, ''));
     if (!kw || seen.has(kw)) continue;
+    const trm = block[1].match(/<ht:approx_traffic>([\s\S]*?)<\/ht:approx_traffic>/);
     seen.add(kw);
-    items.push(kw);
-    if (items.length >= 15) break;
+    out.push({ keyword: kw, raw: parseTraffic(trm && trm[1]) });
   }
-  return items;
+  out.sort((a, b) => b.raw - a.raw);   // 검색량 내림차순
+  return out.slice(0, 15);
 }
 
 const SOURCES = [
@@ -117,6 +125,11 @@ const SOURCES = [
   { key: 'nate', label: '네이트', sub: '실시간', fn: crawlNate },
   { key: 'daum', label: '다음', sub: '실시간', fn: crawlDaum },
 ];
+
+// 크롤러 반환값을 [{keyword, raw}] 형태로 통일 (문자열이면 raw=null)
+function normalize(list) {
+  return list.map((it) => (typeof it === 'string' ? { keyword: it, raw: null } : { keyword: it.keyword, raw: it.raw ?? null }));
+}
 
 // 모든 소스를 병렬 크롤링. 한 소스가 실패해도 나머지는 반환.
 export async function crawlAll() {
@@ -129,7 +142,7 @@ export async function crawlAll() {
       sub: s.sub,
       ok: r.status === 'fulfilled',
       error: r.status === 'rejected' ? String(r.reason?.message || r.reason) : null,
-      keywords: r.status === 'fulfilled' ? r.value : [],
+      items: r.status === 'fulfilled' ? normalize(r.value) : [],
     };
   });
 }

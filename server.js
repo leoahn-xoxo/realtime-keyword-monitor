@@ -21,6 +21,7 @@ const HISTORY_FILE = path.join(DATA_DIR, 'history.json');
 let cache = null;          // 마지막으로 만든 스냅샷(가공 완료)
 let cacheTime = 0;
 let prevScores = {};       // { sourceKey: { keyword: score } } — 직전 크롤링 점수
+let presence = {};         // { sourceKey: { keyword: { streak, rank } } } — 순위 유지/변동 추적
 let history = [];          // [{ t, sources: { key: [[keyword, rank, score], ...] } }]
 let lastHistoryTime = 0;
 
@@ -40,8 +41,8 @@ function saveHistory() {
   } catch (e) { console.warn('history save 실패:', e.message); }
 }
 
-// 순위 → 지수 (1위=10000, 데모와 동일한 곡선)
-const scoreOf = (rank) => Math.round(10000 / Math.pow(rank, 0.62));
+// 순위 기반 기본 점수 곡선 (1위≈10000)
+const baseScore = (rank) => 10000 / Math.pow(rank, 0.62);
 
 // 키워드 → 의미있는 토큰들 (공백 분리 + 2자 이상)
 function tokensOf(keyword) {
@@ -53,19 +54,49 @@ function tokensOf(keyword) {
 }
 
 function buildSnapshot(raw) {
+  const newPresence = {};
   const sources = raw.map((s) => {
     const prev = prevScores[s.key] || {};
-    const scored = s.keywords.map((kw, i) => {
+    const prevPres = presence[s.key] || {};
+    const isGoogle = s.key === 'google';
+    // 구글: 근사 검색량의 최댓값(0~100 환산 기준)
+    const maxRaw = isGoogle ? Math.max(1, ...s.items.map((it) => it.raw || 0)) : 1;
+
+    const scored = s.items.map((it, i) => {
       const rank = i + 1;
-      const score = scoreOf(rank);
+      const kw = it.keyword;
+      let score;
+      if (isGoogle && it.raw > 0) {
+        // 구글 = 실제 근사 검색량 → 상대 관심도 0~100 (최상위=100)
+        score = Math.max(1, Math.round((it.raw / maxRaw) * 100));
+      } else {
+        // 그 외 = 순위 기본점수 + 순위 유지 시간(streak) + 순위 변동 폭 가중
+        const base = baseScore(rank);
+        const p = prevPres[kw];
+        const streak = p ? p.streak : 1;
+        const holdBonus = base * 0.04 * Math.min(streak - 1, 10);          // 오래 머물수록 가산
+        let moveBonus = 0;
+        if (p) moveBonus = base * 0.05 * Math.max(-3, Math.min(6, p.rank - rank)); // 상승 시 가산, 하락 시 소폭 감점
+        score = Math.max(100, Math.round(base + holdBonus + moveBonus));
+      }
       const isNew = !(kw in prev);
       const delta = isNew ? score : score - prev[kw];
-      return { rank, keyword: kw, score, delta, isNew };
+      return { rank, keyword: kw, raw: it.raw, score, delta, isNew };
     });
+
     const total = scored.reduce((a, b) => a + b.score, 0) || 1;
     scored.forEach((it) => { it.ratio = +((it.score / total) * 100).toFixed(1); });
-    return { ...s, items: scored, keywords: undefined };
+
+    // 순위 유지/변동 추적 갱신
+    newPresence[s.key] = {};
+    scored.forEach((it) => {
+      const p = prevPres[it.keyword];
+      newPresence[s.key][it.keyword] = { streak: p ? p.streak + 1 : 1, rank: it.rank };
+    });
+
+    return { ...s, items: scored };
   });
+  presence = newPresence;
 
   // 다음 비교를 위해 점수 저장
   const next = {};

@@ -135,6 +135,20 @@ main { padding: 18px 22px 60px; max-width: 1880px; margin: 0 auto; }
 .row .ratio { text-align: right; color: var(--text-dim); font-variant-numeric: tabular-nums; }
 .col-error { padding: 24px 14px; color: var(--text-faint); text-align: center; font-size: 12px; }
 
+/* ── 지수 설명 한 줄 ───────────────────── */
+.score-note {
+  margin: 14px 2px 0;
+  padding: 11px 16px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--blue);
+  border-radius: 8px;
+  color: var(--text-dim);
+  font-size: 12px;
+  line-height: 1.6;
+}
+.score-note b { color: var(--text); font-weight: 700; }
+
 /* ── Panels ───────────────────────────── */
 .panel {
   background: var(--panel);

@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { crawlAll } from './crawler.js';
 
-const scoreOf = (rank) => Math.round(10000 / Math.pow(rank, 0.62));
+const baseScore = (rank) => Math.round(10000 / Math.pow(rank, 0.62));
 const raw = await crawlAll();
 
 const N = 8;            // 스냅샷 개수
@@ -18,12 +18,17 @@ for (let s = 0; s < N; s++) {
   const entry = { t, sources: {} };
   for (const src of raw) {
     if (!src.ok) continue;
+    const isGoogle = src.key === 'google';
+    const maxRaw = isGoogle ? Math.max(1, ...src.items.map((it) => it.raw || 0)) : 1;
     // 키워드 순서를 스냅샷마다 살짝 섞어 순위 변동 연출 (결정적: 인덱스 기반)
-    const kws = src.keywords.slice(0, 10).map((kw, i) => {
+    const items = src.items.slice(0, 10).map((it, i) => {
       const jitter = ((i * 7 + s * 3) % 5) - 2;       // -2..+2
-      return { kw, sortKey: i + jitter * 0.4 };
-    }).sort((a, b) => a.sortKey - b.sortKey).map((x) => x.kw);
-    entry.sources[src.key] = kws.map((kw, i) => [kw, i + 1, scoreOf(i + 1)]);
+      return { it, sortKey: i + jitter * 0.4 };
+    }).sort((a, b) => a.sortKey - b.sortKey).map((x) => x.it);
+    entry.sources[src.key] = items.map((it, i) => {
+      const score = isGoogle && it.raw > 0 ? Math.max(1, Math.round((it.raw / maxRaw) * 100)) : baseScore(i + 1);
+      return [it.keyword, i + 1, score];
+    });
   }
   history.push(entry);
 }
