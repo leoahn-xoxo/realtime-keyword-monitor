@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm -v)",
+      "Bash(npm install *)",
+      "Bash(node server.js)",
+      "Bash(curl -s \"http://localhost:3000/api/keywords?force=1\")",
+      "Bash(node -e \"let s='';process.stdin.on\\('data',d=>s+=d\\).on\\('end',\\(\\)=>{const j=JSON.parse\\(s\\);console.log\\('updatedAt',j.updatedAt,'cached',j.cached\\);j.sources.forEach\\(x=>{console.log\\('\\\\n['+x.label+'] ok='+x.ok+\\(x.error?' err='+x.error:''\\)\\);x.items.slice\\(0,5\\).forEach\\(i=>console.log\\(' '+i.rank+'. '+i.keyword+'  지수'+i.score+' Δ'+i.delta+' '+i.ratio+'%'\\)\\); }\\);console.log\\('\\\\nCROSS\\('+j.cross.length+'\\):',j.cross.slice\\(0,6\\).map\\(c=>c.keyword+'×'+c.count\\).join\\(', '\\)\\);console.log\\('CHIPS:',j.chips.length\\);}\\);\")",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(git --version)",
+      "Bash(gh --version)",
+      "Bash(gh auth *)",
+      "Bash(git init *)",
+      "Bash(git add *)",
+      "Bash(git -c user.email=dev@example.com -c user.name=dev commit -q -m \"실시간 검색어 모니터링: 4개 매체 크롤링 + 시계열 그래프/표 + 검색 이동\")"
+    ]
+  }
+}

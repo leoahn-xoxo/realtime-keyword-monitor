@@ -1,0 +1,16 @@
+{
+  "name": "realtime-keyword-monitor",
+  "version": "1.0.0",
+  "description": "실시간 검색어 모니터링 - 네이버/ZUM/네이트/다음 실시간 크롤링 대시보드",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
