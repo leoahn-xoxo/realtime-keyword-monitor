@@ -1,6 +1,6 @@
 # 실시간 검색어 모니터링
 
-네이버 · ZUM · 네이트 · 다음의 실시간 데이터를 크롤링해 한 화면에서 보여주는 대시보드입니다.
+네이버 · 구글 · 네이트 · 다음의 실시간 데이터를 크롤링해 한 화면에서 보여주는 대시보드입니다.
 (adsensefarm.kr/realtime 스타일)
 
 ## 실행
@@ -17,9 +17,11 @@ npm start
 | 칼럼 | 소스 | 비고 |
 |------|------|------|
 | **네이버** | 뉴스 많이 본 기사 랭킹 | 옛 '실시간 검색어'는 2021년 폐지 → 뉴스 랭킹 사용 (EUC-KR) |
-| **ZUM** | 실시간 검색어 | zum.com 홈에 임베드된 `real1_id` 파싱 |
+| **구글** | 실시간 급상승 (Google Trends) | 공식 RSS `trends.google.com/trending/rss?geo=KR` |
 | **네이트** | 실시간 이슈 키워드 | `jsonLiveKeywordDataV1.js` (EUC-KR JSON) |
 | **다음** | 주요 뉴스 | news.daum.net 헤드라인 |
+
+> ZUM도 크롤링 가능하지만(`crawler.js`의 `crawlZum` 함수가 남아 있음), 현재 칼럼은 구글로 교체되어 있습니다. 되돌리려면 `crawler.js`의 `SOURCES` 배열만 수정하세요.
 
 > 추가 라이브러리 없이 Node 24 내장 `fetch` + `TextDecoder('euc-kr')`만 사용합니다.
 

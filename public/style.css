@@ -86,8 +86,9 @@ main { padding: 18px 22px 60px; max-width: 1880px; margin: 0 auto; }
   color: #fff;
 }
 .col-head .sub { font-size: 11.5px; font-weight: 600; opacity: .92; }
-.col[data-src="naver"] .col-head { background: linear-gradient(135deg, #08c75a, #06a84c); }
-.col[data-src="zum"]   .col-head { background: linear-gradient(135deg, #fb8b1e, #f1730a); }
+.col[data-src="naver"]  .col-head { background: linear-gradient(135deg, #08c75a, #06a84c); }
+.col[data-src="google"] .col-head { background: linear-gradient(135deg, #5a96f7, #3b78e7); }
+.col[data-src="zum"]    .col-head { background: linear-gradient(135deg, #fb8b1e, #f1730a); }
 .col[data-src="nate"]  .col-head { background: linear-gradient(135deg, #f25762, #e23744); }
 .col[data-src="daum"]  .col-head { background: linear-gradient(135deg, #9b6ef3, #7c4ddb); }
 
@@ -121,8 +122,9 @@ main { padding: 18px 22px 60px; max-width: 1880px; margin: 0 auto; }
   display: flex; align-items: center; gap: 7px;
 }
 .row .kw .dot { width: 14px; height: 14px; border-radius: 4px; flex: 0 0 auto; opacity: .85; }
-.col[data-src="naver"] .dot { background: #08c75a; }
-.col[data-src="zum"]   .dot { background: #f1730a; }
+.col[data-src="naver"]  .dot { background: #08c75a; }
+.col[data-src="google"] .dot { background: #4285f4; }
+.col[data-src="zum"]    .dot { background: #f1730a; }
 .col[data-src="nate"]  .dot { background: #e23744; }
 .col[data-src="daum"]  .dot { background: #7c4ddb; }
 .row .score { text-align: right; font-variant-numeric: tabular-nums; color: var(--text); }
@@ -159,8 +161,9 @@ main { padding: 18px 22px 60px; max-width: 1880px; margin: 0 auto; }
 .chip:hover { filter: brightness(1.12); }
 .chip:active { transform: scale(.96); }
 .chip .rk { opacity: .8; font-weight: 600; margin-left: 5px; }
-.chip[data-src="naver"] { background: #0f8f48; }
-.chip[data-src="zum"]   { background: #d9650a; }
+.chip[data-src="naver"]  { background: #0f8f48; }
+.chip[data-src="google"] { background: #3b78e7; }
+.chip[data-src="zum"]    { background: #d9650a; }
 .chip[data-src="nate"]  { background: #cc2f3b; }
 .chip[data-src="daum"]  { background: #6c41c4; }
 .chip.active { outline: 2px solid #fff; outline-offset: 1px; }

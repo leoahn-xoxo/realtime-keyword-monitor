@@ -5,14 +5,15 @@ const REFRESH_MS = 5 * 60 * 1000;
 
 // 매체별 검색 URL (키워드 클릭 시 새 탭으로 이동)
 const SEARCH_URL = {
-  naver: (q) => `https://search.naver.com/search.naver?query=${encodeURIComponent(q)}`,
-  zum:   (q) => `https://search.zum.com/search.zum?query=${encodeURIComponent(q)}`,
-  nate:  (q) => `https://search.daum.net/nate?w=tot&q=${encodeURIComponent(q)}`,
-  daum:  (q) => `https://search.daum.net/search?w=tot&q=${encodeURIComponent(q)}`,
+  naver:  (q) => `https://search.naver.com/search.naver?query=${encodeURIComponent(q)}`,
+  google: (q) => `https://www.google.com/search?q=${encodeURIComponent(q)}`,
+  zum:    (q) => `https://search.zum.com/search.zum?query=${encodeURIComponent(q)}`,
+  nate:   (q) => `https://search.daum.net/nate?w=tot&q=${encodeURIComponent(q)}`,
+  daum:   (q) => `https://search.daum.net/search?w=tot&q=${encodeURIComponent(q)}`,
 };
-const SRC_COLOR = { naver: '#08c75a', zum: '#f1730a', nate: '#e23744', daum: '#7c4ddb' };
+const SRC_COLOR = { naver: '#08c75a', google: '#4285f4', zum: '#f1730a', nate: '#e23744', daum: '#7c4ddb' };
 const SOURCES = [
-  { key: 'naver', label: '네이버' }, { key: 'zum', label: 'ZUM' },
+  { key: 'naver', label: '네이버' }, { key: 'google', label: '구글' },
   { key: 'nate', label: '네이트' }, { key: 'daum', label: '다음' },
 ];
 

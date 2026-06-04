@@ -91,9 +91,29 @@ async function crawlDaum() {
   return items;
 }
 
+// ─────────────────────────────────────────────────────────
+// 구글 — Google Trends 실시간 급상승 (공식 RSS, UTF-8)
+// ─────────────────────────────────────────────────────────
+async function crawlGoogle() {
+  const buf = await getBuffer('https://trends.google.com/trending/rss?geo=KR', 'https://trends.google.com/');
+  const xml = decodeUTF8(buf);
+  const items = [];
+  const seen = new Set();
+  for (const block of xml.matchAll(/<item>([\s\S]*?)<\/item>/g)) {
+    const m = block[1].match(/<title>([\s\S]*?)<\/title>/);
+    if (!m) continue;
+    const kw = clean(m[1].replace(/<!\[CDATA\[|\]\]>/g, ''));
+    if (!kw || seen.has(kw)) continue;
+    seen.add(kw);
+    items.push(kw);
+    if (items.length >= 15) break;
+  }
+  return items;
+}
+
 const SOURCES = [
   { key: 'naver', label: '네이버', sub: '뉴스 많이 본 기사', fn: crawlNaver },
-  { key: 'zum', label: 'ZUM', sub: '실시간', fn: crawlZum },
+  { key: 'google', label: '구글', sub: '실시간 급상승', fn: crawlGoogle },
   { key: 'nate', label: '네이트', sub: '실시간', fn: crawlNate },
   { key: 'daum', label: '다음', sub: '실시간', fn: crawlDaum },
 ];
