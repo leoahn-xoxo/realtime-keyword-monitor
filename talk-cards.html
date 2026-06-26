@@ -33,7 +33,7 @@
   #card{
     background:var(--surface); border:0.5px solid var(--border); border-radius:18px;
     padding:34px 20px; flex:1; min-height:220px; display:flex; flex-direction:column;
-    justify-content:center; gap:18px; text-align:center; margin-bottom:8px;
+    justify-content:center; gap:18px; text-align:center; margin-bottom:8px; cursor:pointer;
   }
   #badge{ align-self:center; font-size:13px; font-weight:600; padding:6px 14px; border-radius:9px; }
   #keyword{ font-size:32px; font-weight:600; line-height:1.35; margin:0; letter-spacing:-.02em; }
@@ -117,10 +117,12 @@ function show(card){ const c=CATS[card[0]];
 }
 function pick(){ const p=pool(); let n; do{ n=p[Math.floor(Math.random()*p.length)]; }while(p.length>1 && n[1]===kwEl.textContent); return n; }
 
-document.getElementById('next').onclick=()=>show(pick());
-document.getElementById('spin').onclick=()=>{ const btn=document.getElementById('spin'); btn.disabled=true;
+function spin(){ const btn=document.getElementById('spin'); if(btn.disabled) return; btn.disabled=true;
   let t=0; const total=18; (function step(){ show(pick()); t++; if(t<total) setTimeout(step,50+t*t*1.2); else btn.disabled=false; })();
-};
+}
+document.getElementById('next').onclick=()=>show(pick());
+document.getElementById('spin').onclick=spin;
+document.getElementById('card').onclick=spin;
 renderChips(); updateCounter();
 </script>
 </body>
