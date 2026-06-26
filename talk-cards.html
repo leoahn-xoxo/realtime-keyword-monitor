@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>토크 카드 🍻</title>
+<style>
+  :root{
+    --bg:#faf9f5; --surface:#ffffff; --text:#1a1a18; --text2:#6b6a64; --text3:#9a988f; --border:rgba(0,0,0,.12);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#1f1e1c; --surface:#2a2926; --text:#f2f1ec; --text2:#a8a69d; --text3:#75736b; --border:rgba(255,255,255,.14); }
+  }
+  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body{ margin:0; padding:0; height:100%; }
+  body{
+    background:var(--bg); color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Segoe UI",sans-serif;
+    display:flex; flex-direction:column; align-items:center;
+    padding:max(16px,env(safe-area-inset-top)) 16px max(20px,env(safe-area-inset-bottom));
+    min-height:100vh; user-select:none; -webkit-user-select:none;
+  }
+  .wrap{ width:100%; max-width:440px; display:flex; flex-direction:column; flex:1; }
+  h1{ font-size:18px; font-weight:600; text-align:center; margin:4px 0 14px; letter-spacing:-.01em; }
+  #chips{ display:flex; flex-wrap:wrap; gap:7px; justify-content:center; margin-bottom:14px; }
+  .chip{
+    font-size:13px; font-weight:500; padding:7px 12px; border-radius:9px; cursor:pointer;
+    border:0.5px solid var(--border); background:transparent; color:var(--text3); opacity:.55; transition:all .12s;
+  }
+  .chip.on{ opacity:1; }
+  #card{
+    background:var(--surface); border:0.5px solid var(--border); border-radius:18px;
+    padding:34px 20px; flex:1; min-height:220px; display:flex; flex-direction:column;
+    justify-content:center; gap:18px; text-align:center; margin-bottom:8px;
+  }
+  #badge{ align-self:center; font-size:13px; font-weight:600; padding:6px 14px; border-radius:9px; }
+  #keyword{ font-size:32px; font-weight:600; line-height:1.35; margin:0; letter-spacing:-.02em; }
+  #counter{ font-size:12px; color:var(--text3); text-align:center; margin:10px 0 16px; }
+  .btns{ display:flex; gap:10px; }
+  button.act{
+    flex:1; height:56px; font-size:17px; font-weight:600; border-radius:13px;
+    border:0.5px solid var(--border); background:var(--surface); color:var(--text); cursor:pointer;
+    font-family:inherit; transition:transform .08s;
+  }
+  button.act:active{ transform:scale(.97); }
+  #spin{ flex:2; }
+  button:disabled{ opacity:.5; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🍻 토크 카드</h1>
+  <div id="chips"></div>
+  <div id="card">
+    <div id="badge">준비 완료</div>
+    <p id="keyword">탭해서<br>첫 카드 뽑기</p>
+  </div>
+  <p id="counter"></p>
+  <div class="btns">
+    <button id="spin" class="act">🎲 돌리기</button>
+    <button id="next" class="act">다음 ›</button>
+  </div>
+</div>
+
+<script>
+const CATS = [
+  {name:'일상',      l:'#E1F5EE',d:'#0F6E56', dl:'#0F6E56',dd:'#9FE1CB'},
+  {name:'취향',      l:'#EEEDFE',d:'#3C3489', dl:'#3C3489',dd:'#CECBF6'},
+  {name:'먹부림',    l:'#FAECE7',d:'#993C1D', dl:'#993C1D',dd:'#F5C4B3'},
+  {name:'여가',      l:'#E6F1FB',d:'#0C447C', dl:'#0C447C',dd:'#B5D4F4'},
+  {name:'아이·딸',   l:'#FAEEDA',d:'#854F0B', dl:'#854F0B',dd:'#FAC775'},
+  {name:'일·일터',   l:'#EAF3DE',d:'#3B6D11', dl:'#3B6D11',dd:'#C0DD97'},
+  {name:'요즘 트렌드',l:'#FCEBEB',d:'#791F1F', dl:'#791F1F',dd:'#F7C1C1'},
+  {name:'추억',      l:'#FBEAF0',d:'#72243E', dl:'#72243E',dd:'#F4C0D1'},
+];
+const CARDS = [
+  [0,'주말'],[0,'요즘 날씨'],[0,'동네 · 사는 곳'],[0,'출퇴근길'],[0,'아침형 vs 저녁형'],[0,'요즘 빠진 거'],[0,'반려동물'],[0,'잠 · 수면 패턴'],
+  [1,'넷플릭스 · 드라마'],[1,'노래 · 플레이리스트'],[1,'커피 취향'],[1,'술 취향'],[1,'MBTI'],[1,'좋아하는 계절'],[1,'덕질 · 최애'],[1,'쇼핑 스타일'],
+  [2,'맛집'],[2,'안주'],[2,'배달음식'],[2,'야식'],[2,'못 먹는 음식'],[2,'인생 디저트'],[2,'편의점 꿀조합'],[2,'집밥 vs 외식'],
+  [3,'여행'],[3,'운동'],[3,'취미'],[3,'캠핑 · 차박'],[3,'드라이브'],[3,'요즘 핫플'],[3,'가보고 싶은 곳'],[3,'주말 나들이'],
+  [4,'딸 키우기'],[4,'요즘 초등 학원'],[4,'받아쓰기 · 알림장'],[4,'아이 최애 캐릭터'],[4,'키즈 유튜브'],[4,'학교 친구 관계'],[4,'용돈 교육'],[4,'아이 장래희망'],
+  [5,'재택 vs 출근'],[5,'요즘 점심값'],[5,'AI가 바꾼 내 일'],[5,'챗GPT 써봤어요?'],[5,'인상 깊었던 광고'],[5,'요즘 교실 풍경'],[5,'워라밸'],[5,'N잡 · 부업'],[5,'전업주부 하루 일과'],
+  [6,'2026 월드컵'],[6,'응원하는 팀 · 선수'],[6,'AI 그림 · 챗봇'],[6,'숏폼 (릴스 · 쇼츠)'],[6,'요즘 유행어'],[6,'핫한 드라마 · 예능'],[6,'러닝 열풍'],[6,'올해 가본 여행지'],
+  [7,'어릴 때 별명'],[7,'학창시절'],[7,'첫 직장'],[7,'옛날 게임'],[7,'그때 그 유행'],[7,'추억의 노래'],[7,'학교 앞 분식'],
+];
+
+const dark = matchMedia('(prefers-color-scheme: dark)').matches;
+let active = CATS.map((_,i)=>i);
+const chipsEl=document.getElementById('chips'), kwEl=document.getElementById('keyword');
+const badgeEl=document.getElementById('badge'), counterEl=document.getElementById('counter');
+
+function chipColors(c,on){
+  if(!on) return '';
+  return dark ? `background:${c.d}; color:${c.dd}; border-color:${c.d};`
+              : `background:${c.l}; color:${c.dl}; border-color:${c.dl}33;`;
+}
+function renderChips(){
+  chipsEl.innerHTML='';
+  CATS.forEach((c,i)=>{
+    const on=active.includes(i);
+    const b=document.createElement('button');
+    b.className='chip'+(on?' on':'');
+    b.style.cssText=chipColors(c,on);
+    b.textContent=c.name;
+    b.onclick=()=>{ if(active.includes(i)){ if(active.length>1) active=active.filter(x=>x!==i);} else active.push(i); renderChips(); updateCounter(); };
+    chipsEl.appendChild(b);
+  });
+}
+function pool(){ return CARDS.filter(c=>active.includes(c[0])); }
+function updateCounter(){ counterEl.textContent=`덱: ${pool().length}개 · 카테고리 ${active.length}개`; }
+function show(card){ const c=CATS[card[0]];
+  badgeEl.style.background = dark? c.d : c.l;
+  badgeEl.style.color = dark? c.dd : c.dl;
+  badgeEl.textContent=c.name; kwEl.textContent=card[1];
+}
+function pick(){ const p=pool(); let n; do{ n=p[Math.floor(Math.random()*p.length)]; }while(p.length>1 && n[1]===kwEl.textContent); return n; }
+
+document.getElementById('next').onclick=()=>show(pick());
+document.getElementById('spin').onclick=()=>{ const btn=document.getElementById('spin'); btn.disabled=true;
+  let t=0; const total=18; (function step(){ show(pick()); t++; if(t<total) setTimeout(step,50+t*t*1.2); else btn.disabled=false; })();
+};
+renderChips(); updateCounter();
+</script>
+</body>
+</html>
