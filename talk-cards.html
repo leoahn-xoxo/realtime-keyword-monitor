@@ -2,80 +2,93 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>토크 카드 🍻</title>
+<title>말이 술술</title>
 <style>
   :root{
-    --bg:#faf9f5; --surface:#ffffff; --text:#1a1a18; --text2:#6b6a64; --text3:#9a988f; --border:rgba(0,0,0,.12);
+    --bg:#f6f4ee; --surface:#ffffff; --ink:#1a1a18; --ink2:#6b6a64; --ink3:#a09e95; --line:rgba(0,0,0,.10);
   }
   @media (prefers-color-scheme: dark){
-    :root{ --bg:#1f1e1c; --surface:#2a2926; --text:#f2f1ec; --text2:#a8a69d; --text3:#75736b; --border:rgba(255,255,255,.14); }
+    :root{ --bg:#1b1a18; --surface:#262522; --ink:#f3f1ec; --ink2:#a8a69d; --ink3:#6f6d65; --line:rgba(255,255,255,.12); }
   }
-  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-  html,body{ margin:0; padding:0; height:100%; }
+  *{ box-sizing:border-box; margin:0; -webkit-tap-highlight-color:transparent; }
+  html,body{ height:100%; }
   body{
-    background:var(--bg); color:var(--text);
+    background:var(--bg); color:var(--ink); overflow:hidden;
     font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Segoe UI",sans-serif;
-    display:flex; flex-direction:column; align-items:center;
-    padding:max(16px,env(safe-area-inset-top)) 16px max(20px,env(safe-area-inset-bottom));
-    min-height:100vh; user-select:none; -webkit-user-select:none;
+    -webkit-user-select:none; user-select:none;
+    padding:calc(env(safe-area-inset-top) + 14px) 18px calc(env(safe-area-inset-bottom) + 14px);
+    height:100dvh;
   }
-  .wrap{ width:100%; max-width:440px; display:flex; flex-direction:column; flex:1; }
-  h1{ font-size:18px; font-weight:600; text-align:center; margin:4px 0 14px; letter-spacing:-.01em; }
-  #chips{ display:flex; flex-wrap:wrap; gap:7px; justify-content:center; margin-bottom:14px; }
-  .chip{
-    font-size:13px; font-weight:500; padding:7px 12px; border-radius:9px; cursor:pointer;
-    border:0.5px solid var(--border); background:transparent; color:var(--text3); opacity:.55; transition:all .12s;
+  .stage{ height:100%; max-width:440px; margin:0 auto; display:flex; flex-direction:column; gap:14px; }
+
+  header{ text-align:center; }
+  .eyebrow{ font-size:11px; font-weight:600; letter-spacing:.22em; color:var(--ink3); text-transform:uppercase; }
+  h1{ font-size:34px; font-weight:800; letter-spacing:-.02em; line-height:1.05; margin-top:6px; }
+  .tag{ font-size:13px; color:var(--ink2); margin-top:7px; letter-spacing:-.01em; }
+
+  .card{
+    position:relative; flex:1; min-height:0; overflow:hidden;
+    background:var(--surface); border:0.5px solid var(--line); border-radius:24px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px;
+    padding:24px; text-align:center; cursor:pointer; transition:transform .12s ease;
   }
-  .chip.on{ opacity:1; }
-  #card{
-    background:var(--surface); border:0.5px solid var(--border); border-radius:18px;
-    padding:34px 20px; flex:1; min-height:220px; display:flex; flex-direction:column;
-    justify-content:center; gap:18px; text-align:center; margin-bottom:8px; cursor:pointer;
+  .card:active{ transform:scale(.985); }
+  .card.pop #keyword{ animation:pop .34s cubic-bezier(.2,.8,.2,1); }
+  @keyframes pop{ 0%{ transform:scale(.82); opacity:.3 } 60%{ transform:scale(1.04) } 100%{ transform:scale(1) } }
+
+  .deco{ position:absolute; pointer-events:none; }
+  .ring{ width:160px; height:160px; border-radius:50%; border:1.5px solid var(--line); top:-54px; right:-46px; opacity:.7; }
+  .ring2{ width:90px; height:90px; border-radius:50%; border:1.5px solid var(--line); bottom:-30px; left:-24px; opacity:.55; }
+  .dot{ width:9px; height:9px; border-radius:50%; background:var(--ink3); opacity:.35; top:26px; left:26px; }
+
+  #badge{ position:relative; z-index:1; font-size:13px; font-weight:700; padding:6px 15px; border-radius:999px; letter-spacing:-.01em; }
+  #keyword{ position:relative; z-index:1; font-size:36px; font-weight:800; line-height:1.28; letter-spacing:-.025em; }
+  .cardhint{ position:relative; z-index:1; font-size:11.5px; color:var(--ink3); letter-spacing:.01em; }
+
+  #grid{ display:grid; grid-template-columns:repeat(5,1fr); gap:8px; }
+  .tile{
+    border:none; border-radius:14px; padding:13px 4px; font-size:13px; font-weight:700;
+    font-family:inherit; cursor:pointer; letter-spacing:-.03em; line-height:1.15;
+    display:flex; align-items:center; justify-content:center; min-height:52px; transition:transform .1s ease;
   }
-  #badge{ align-self:center; font-size:13px; font-weight:600; padding:6px 14px; border-radius:9px; }
-  #keyword{ font-size:32px; font-weight:600; line-height:1.35; margin:0; letter-spacing:-.02em; }
-  #counter{ font-size:12px; color:var(--text3); text-align:center; margin:10px 0 16px; }
-  .btns{ display:flex; gap:10px; }
-  button.act{
-    flex:1; height:56px; font-size:17px; font-weight:600; border-radius:13px;
-    border:0.5px solid var(--border); background:var(--surface); color:var(--text); cursor:pointer;
-    font-family:inherit; transition:transform .08s;
-  }
-  button.act:active{ transform:scale(.97); }
-  #spin{ flex:2; }
-  button:disabled{ opacity:.5; }
+  .tile:active{ transform:scale(.93); }
+  .foot{ text-align:center; font-size:11.5px; color:var(--ink3); }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <h1>🍻 토크 카드</h1>
-  <div id="chips"></div>
-  <div id="card">
-    <div id="badge">준비 완료</div>
-    <p id="keyword">탭해서<br>첫 카드 뽑기</p>
+<div class="stage">
+  <header>
+    <p class="eyebrow">first dinner · 한 잔의 기술</p>
+    <h1>말이 술술</h1>
+    <p class="tag">한 장 뽑고, 한 잔 가고 🥂</p>
+  </header>
+
+  <div id="card" class="card">
+    <span class="deco ring"></span><span class="deco ring2"></span><span class="deco dot"></span>
+    <div id="badge">오늘의 주제</div>
+    <p id="keyword">탭해서<br>시작</p>
+    <p class="cardhint">카드 탭 = 전체 랜덤 · 아래 = 주제별</p>
   </div>
-  <p id="counter"></p>
-  <div class="btns">
-    <button id="spin" class="act">🎲 돌리기</button>
-    <button id="next" class="act">다음 ›</button>
-  </div>
+
+  <div id="grid"></div>
+  <p class="foot">주제를 탭하면 한 장씩 펼쳐집니다</p>
 </div>
 
 <script>
 const CATS = [
-  {name:'일상',      l:'#E1F5EE',d:'#0F6E56', dl:'#0F6E56',dd:'#9FE1CB'},
-  {name:'취향',      l:'#EEEDFE',d:'#3C3489', dl:'#3C3489',dd:'#CECBF6'},
-  {name:'먹부림',    l:'#FAECE7',d:'#993C1D', dl:'#993C1D',dd:'#F5C4B3'},
-  {name:'술',        l:'#FAEEDA',d:'#854F0B', dl:'#854F0B',dd:'#FAC775'},
-  {name:'운세·점',   l:'#EEEDFE',d:'#3C3489', dl:'#3C3489',dd:'#CECBF6'},
-  {name:'여가',      l:'#E6F1FB',d:'#0C447C', dl:'#0C447C',dd:'#B5D4F4'},
-  {name:'아이·딸',   l:'#FBEAF0',d:'#72243E', dl:'#72243E',dd:'#F4C0D1'},
-  {name:'일·일터',   l:'#EAF3DE',d:'#3B6D11', dl:'#3B6D11',dd:'#C0DD97'},
-  {name:'요즘 트렌드',l:'#FCEBEB',d:'#791F1F', dl:'#791F1F',dd:'#F7C1C1'},
-  {name:'추억',      l:'#F1EFE8',d:'#5F5E5A', dl:'#444441',dd:'#D3D1C7'},
+  {name:'일상',    l:'#E1F5EE',d:'#0F6E56', dl:'#0F6E56',dd:'#9FE1CB'},
+  {name:'취향',    l:'#EEEDFE',d:'#3C3489', dl:'#3C3489',dd:'#CECBF6'},
+  {name:'먹부림',  l:'#FAECE7',d:'#993C1D', dl:'#993C1D',dd:'#F5C4B3'},
+  {name:'술',      l:'#FAEEDA',d:'#854F0B', dl:'#854F0B',dd:'#FAC775'},
+  {name:'운세·점', l:'#EEEDFE',d:'#3C3489', dl:'#3C3489',dd:'#CECBF6'},
+  {name:'여가',    l:'#E6F1FB',d:'#0C447C', dl:'#0C447C',dd:'#B5D4F4'},
+  {name:'아이·딸', l:'#FBEAF0',d:'#72243E', dl:'#72243E',dd:'#F4C0D1'},
+  {name:'일·일터', l:'#EAF3DE',d:'#3B6D11', dl:'#3B6D11',dd:'#C0DD97'},
+  {name:'트렌드',  l:'#FCEBEB',d:'#791F1F', dl:'#791F1F',dd:'#F7C1C1'},
+  {name:'추억',    l:'#F1EFE8',d:'#5F5E5A', dl:'#444441',dd:'#D3D1C7'},
 ];
 const CARDS = [
   [0,'주말'],[0,'요즘 날씨'],[0,'동네 · 사는 곳'],[0,'출퇴근길'],[0,'아침형 vs 저녁형'],[0,'요즘 빠진 거'],[0,'반려동물'],[0,'잠 · 수면 패턴'],
@@ -91,43 +104,37 @@ const CARDS = [
 ];
 
 const dark = matchMedia('(prefers-color-scheme: dark)').matches;
-let active = CATS.map((_,i)=>i);
-const chipsEl=document.getElementById('chips'), kwEl=document.getElementById('keyword');
-const badgeEl=document.getElementById('badge'), counterEl=document.getElementById('counter');
+const cardEl=document.getElementById('card'), badgeEl=document.getElementById('badge'), kwEl=document.getElementById('keyword'), gridEl=document.getElementById('grid');
+let busy=false, last=null;
 
-function chipColors(c,on){
-  if(!on) return '';
-  return dark ? `background:${c.d}; color:${c.dd}; border-color:${c.d};`
-              : `background:${c.l}; color:${c.dl}; border-color:${c.dl}33;`;
-}
-function renderChips(){
-  chipsEl.innerHTML='';
+function renderGrid(){
   CATS.forEach((c,i)=>{
-    const on=active.includes(i);
     const b=document.createElement('button');
-    b.className='chip'+(on?' on':'');
-    b.style.cssText=chipColors(c,on);
-    b.textContent=c.name;
-    b.onclick=()=>{ if(active.includes(i)){ if(active.length>1) active=active.filter(x=>x!==i);} else active.push(i); renderChips(); updateCounter(); };
-    chipsEl.appendChild(b);
+    b.className='tile'; b.textContent=c.name;
+    b.style.cssText = dark ? `background:${c.d};color:${c.dd};` : `background:${c.l};color:${c.dl};`;
+    b.onclick=()=>draw(i);
+    gridEl.appendChild(b);
   });
 }
-function pool(){ return CARDS.filter(c=>active.includes(c[0])); }
-function updateCounter(){ counterEl.textContent=`덱: ${pool().length}개 · 카테고리 ${active.length}개`; }
+function poolFor(i){ return i==null ? CARDS : CARDS.filter(c=>c[0]===i); }
 function show(card){ const c=CATS[card[0]];
   badgeEl.style.background = dark? c.d : c.l;
   badgeEl.style.color = dark? c.dd : c.dl;
-  badgeEl.textContent=c.name; kwEl.textContent=card[1];
+  badgeEl.textContent = c.name;
+  kwEl.textContent = card[1];
 }
-function pick(){ const p=pool(); let n; do{ n=p[Math.floor(Math.random()*p.length)]; }while(p.length>1 && n[1]===kwEl.textContent); return n; }
-
-function spin(){ const btn=document.getElementById('spin'); if(btn.disabled) return; btn.disabled=true;
-  let t=0; const total=18; (function step(){ show(pick()); t++; if(t<total) setTimeout(step,50+t*t*1.2); else btn.disabled=false; })();
+function pick(p){ let n; do{ n=p[Math.floor(Math.random()*p.length)]; }while(p.length>1 && n[1]===last); last=n[1]; return n; }
+function draw(i){
+  if(busy) return; busy=true;
+  const p=poolFor(i); let t=0; const total=8;
+  (function step(){
+    show(pick(p)); t++;
+    if(t<total){ setTimeout(step, 38 + t*t*3); }
+    else { busy=false; cardEl.classList.remove('pop'); void cardEl.offsetWidth; cardEl.classList.add('pop'); }
+  })();
 }
-document.getElementById('next').onclick=()=>show(pick());
-document.getElementById('spin').onclick=spin;
-document.getElementById('card').onclick=spin;
-renderChips(); updateCounter();
+cardEl.onclick=()=>draw(null);
+renderGrid();
 </script>
 </body>
 </html>
